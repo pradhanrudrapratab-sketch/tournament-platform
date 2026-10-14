@@ -185,7 +185,9 @@ router.post('/tournaments/:id/results', wrap(async (req, res) => {
   let prizeTotal = 0;
   const clean = [];
   const confirmed = (await db.query("SELECT id, player_id FROM registrations WHERE tournament_id=$1 AND status='confirmed'", [t.id])).rows;
-  const byPlayer = new Map(confirmed.map((r) => [r.player_id, r.id]));
+  const byPlayer = new Map(
+  confirmed.map((r) => [Number(r.player_id), r.id])
+);
   for (const e of entries) {
     const pid = v.int(e.player_id, 'player_id', { min: 1 });
     if (!byPlayer.has(pid) || seen.has(pid)) throw new HttpError(400, 'INVALID_INPUT', 'Results can only include each confirmed player once.');
